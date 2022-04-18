@@ -2,8 +2,6 @@
 Models of the Quizes app
 """
 
-
-from tabnanny import verbose
 from django.db import models
 
 # Validators
@@ -95,7 +93,7 @@ class Quiz(models.Model):
 
     @property
     def get_questions(self):
-        return self.questions.all()
+        return self.questions.all()[:self.number_of_questions]
 
     class Meta:
         verbose_name_plural = "Quizes"
