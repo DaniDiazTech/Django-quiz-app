@@ -1,4 +1,12 @@
 {% extends 'base.html' %}
+{% load static %}
+
+
+{% block scripts %}
+
+<script src="{% static 'quizes/quizes.js' %}" defer></script>
+
+{% endblock scripts %}
 
 
 {% block title %}Home{% endblock title %}
