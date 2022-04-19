@@ -2,12 +2,63 @@ const url = window.location.href
 console.log(url)
 
 const quizBox = document.getElementById('quiz-box')
+const timerBox = document.getElementById('timer-box')
+
+const activateTimer = (time) =>{
+    // First state
+    if (time.toString().lenght < 2){
+        timerBox.innerHTML = `<b>0${time}:00</b>`
+    } else {
+        timerBox.innerHTML = `<b>${time}:00</b>`
+    }
+
+    // countdown
+    let minutes = time - 1
+    let seconds = 60
+
+    let displaySeconds
+    let displayMinutes
+
+    const timer = setInterval(()=>{
+        seconds --        
+        if (seconds < 0){
+            seconds = 59
+            minutes --
+        }
+        if (minutes.toString().length < 2){
+            displayMinutes = '0' + minutes
+        } else {
+            displayMinutes = minutes
+        }
+
+        if (seconds.toString().length < 2){
+            displaySeconds = '0' + seconds
+        } else {
+            displaySeconds = seconds
+        }
+
+        if (minutes === 0 && seconds === 0){
+            timerBox.innerHTML = '<b>00:00</b>'
+            setTimeout(()=>{
+                clearInterval(timer)
+                alert('Time is over')
+                sendData()
+            }, 500)            
+        }
+        console.log(displayMinutes, displaySeconds)
+        timerBox.innerHTML = `<b>${displayMinutes}:${displaySeconds}</b>`
+
+    }, 1000)
+
+} 
+
 
 $.ajax({
     type: 'GET',
     url: `${url}/data`, // Gets data from JsonResponse
     success: function(response){
         const data = response.data 
+        const time = response.time
         data.forEach(element => { // A dictionary of a Question and its answers
             for (const [question, answers] of Object.entries(element)){
                 quizBox.innerHTML  += `
@@ -26,6 +77,7 @@ $.ajax({
                 })
             }
         })
+        activateTimer(time)
     },
     error: function(error){
         console.log(error)
@@ -39,6 +91,9 @@ const scoreBox = document.getElementById('score-box')
 const resultBox = document.getElementById('result-box')
 
 const sendData = () => {
+    // TODO: stops the timer
+    timerBox.remove()
+     
     const elements = [...document.getElementsByClassName('ans')]
     const data = {}
     data['csrfmiddlewaretoken'] = csrf[0].value
