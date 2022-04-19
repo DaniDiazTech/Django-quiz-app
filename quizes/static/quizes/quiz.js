@@ -35,6 +35,9 @@ $.ajax({
 const quizForm = document.getElementById('quiz-form')
 const csrf = document.getElementsByName('csrfmiddlewaretoken') 
 
+const scoreBox = document.getElementById('score-box')
+const resultBox = document.getElementById('result-box')
+
 const sendData = () => {
     const elements = [...document.getElementsByClassName('ans')]
     const data = {}
@@ -56,15 +59,31 @@ const sendData = () => {
         data: data,
         success: function(response){
             const results = response.results
-            quizForm.classList.add('not-visible') // Class defined in the custom css
+            const n_correct_answers = response.score
+            const score = response.score.toFixed(2)
+            const passed = response.passed
+
+            // Removes the form 
+            quizForm.remove()
+            
+            let scoreDiv = document.createElement('div')
+            // scoreDiv.classList.add(...['container', 'my-auto', 'text-secondary'])
+            
+            
+            scoreDiv.innerHTML += `
+                               <p> ${passed ? 'Congrats you passed the test!' : 'Sorry, you did not pass the test!'} Your result is ${score} %</p>
+                               <p> Answered correctly: ${n_correct_answers}</p>
+                               `
+
+            scoreBox.append(scoreDiv)
 
             results.forEach(res =>{
-                const resDiv = document.createElement('div')
+                let resDiv = document.createElement('div')
                 
                 for (const [question, resp] of Object.entries(res)){
                     resDiv.innerHTML += question
 
-                    const classes = ['container', 'p-3', 'text-light', 'h3']
+                    const classes = ['container', 'p-3', 'text-light', 'h4']
                     resDiv.classList.add(...classes)
 
                     if (resp == 'not answered'){
@@ -84,8 +103,7 @@ const sendData = () => {
                         }
                     }
                 }
-                const body = document.getElementsByTagName('body')[0] 
-                body.append(resDiv)
+                resultBox.append(resDiv)
             })
         },
         error: function(error){

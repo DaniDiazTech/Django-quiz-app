@@ -43,6 +43,7 @@ def save_quiz_view(request, pk):
         user = request.user
         quiz = Quiz.objects.get(pk=pk)
 
+        required_score = quiz.required_score
         score = 0
         multiplier = 100 / len(questions) 
         results = []
@@ -64,18 +65,18 @@ def save_quiz_view(request, pk):
 
         final_score = score * multiplier
 
+
         Result.objects.create(quiz=quiz, user=user, score=final_score)
 
         json_response = {
             'score': final_score,
             'correct_questions': score,
             'passed': False,
+            'required_score': required_score,
             'results': results
         }
 
-        print(score, final_score, questions, quiz, quiz.required_score, multiplier, sep=" || ")
-
-        if final_score >= quiz.required_score:
+        if final_score >= required_score:
             json_response['passed'] = True
             return JsonResponse(json_response)    
 
