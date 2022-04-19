@@ -55,7 +55,38 @@ const sendData = () => {
         url: `${url}/save`,
         data: data,
         success: function(response){
-            console.log(response)
+            const results = response.results
+            quizForm.classList.add('not-visible') // Class defined in the custom css
+
+            results.forEach(res =>{
+                const resDiv = document.createElement('div')
+                
+                for (const [question, resp] of Object.entries(res)){
+                    resDiv.innerHTML += question
+
+                    const classes = ['container', 'p-3', 'text-light', 'h3']
+                    resDiv.classList.add(...classes)
+
+                    if (resp == 'not answered'){
+                        resDiv.innerHTML += ' — Not answered'
+                        resDiv.classList.add('bg-danger')
+                    } else{
+                        const answer = resp['answered']
+                        const correct = resp['correct_answer']
+
+                        if (answer == correct){
+                            resDiv.classList.add('bg-success')
+                            resDiv.innerHTML += ` Answered: ${answer}`
+                        } else {
+                            resDiv.classList.add('bg-danger')
+                            resDiv.innerHTML += `| Answered: ${answer}`
+                            resDiv.innerHTML += `| Correct answer: ${correct}`
+                        }
+                    }
+                }
+                const body = document.getElementsByTagName('body')[0] 
+                body.append(resDiv)
+            })
         },
         error: function(error){
             console.log(error)
